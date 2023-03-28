@@ -14,14 +14,17 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Variables
+    [SerializeField] private GameObject player;
+    private Vector3 playerInitialPosition;
     private int collectedItemCount;
+    [SerializeField] private int maxCollectedItemCount;
     [SerializeField] private CollectablesCountUI collectablesCountUI;
     #endregion
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        playerInitialPosition = player.transform.position;
     }
 
     // Update is called once per frame
@@ -39,5 +42,15 @@ public class GameManager : MonoBehaviour
     public int GetCollectedItemCount()
     {   
         return collectedItemCount;
+    }
+
+    public int GetMaxCollectedItemCount()
+    {
+        return maxCollectedItemCount;
+    }
+
+    public void Respawn()
+    {
+        player.transform.position = playerInitialPosition;
     }
 }

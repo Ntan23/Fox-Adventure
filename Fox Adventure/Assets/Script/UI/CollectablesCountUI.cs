@@ -11,10 +11,12 @@ public class CollectablesCountUI : MonoBehaviour
     void Start()
     {
         gm = GameManager.Instance;
+
+        UpdateCollectablesCountUI();
     }
 
     public void UpdateCollectablesCountUI()
     {
-        collectablesCountText.text = gm.GetCollectedItemCount().ToString();
+        collectablesCountText.text = gm.GetCollectedItemCount().ToString() + " / " + gm.GetMaxCollectedItemCount().ToString();
     }
 }
