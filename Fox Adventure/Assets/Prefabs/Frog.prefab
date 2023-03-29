@@ -99,11 +99,11 @@ BoxCollider2D:
   m_GameObject: {fileID: 7588738783176417970}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 9b421dc191daaa542913197f636fc41a, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.07859039, y: -0.086832404}
+  m_Offset: {x: -0.05802536, y: -0.086832404}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -114,7 +114,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.143074, y: 1.2011416}
+  m_Size: {x: 1.101944, y: 1.2011416}
   m_EdgeRadius: 0
 --- !u!50 &7588738783176417971
 Rigidbody2D:

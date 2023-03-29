@@ -5,17 +5,13 @@ using UnityEngine;
 public class EnemyAttack : MonoBehaviour
 {
     [SerializeField] private float knockbackForce;
+    private AudioManager audioManager;
+    private GameManager gm;
 
-    // Start is called before the first frame update
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        audioManager = AudioManager.Instance;
+        gm = GameManager.Instance;
     }
 
     void OnCollisionEnter2D(Collision2D other)
@@ -28,6 +24,10 @@ public class EnemyAttack : MonoBehaviour
 
             if(transform.position.x > other.gameObject.transform.position.x) rb.velocity = new Vector2(-knockbackForce, rb.velocity.y);
             else if(transform.position.x < other.gameObject.transform.position.x ) rb.velocity = new Vector2(knockbackForce, rb.velocity.y);
+
+            audioManager.PlayHurtSFX();
+
+            gm.LoseLive();
         }
     }
 }

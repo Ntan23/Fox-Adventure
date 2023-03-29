@@ -4,23 +4,18 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    private PlayerController playerController;
     [SerializeField] private float jumpForceAfterAttack;
+    private PlayerController playerController;
+    private AudioManager audioManager;
 
     void Awake()
     {
         playerController = GetComponent<PlayerController>();
     }
-    // Start is called before the first frame update
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        audioManager = AudioManager.Instance;
     }
 
     void OnCollisionEnter2D(Collision2D other)
@@ -29,6 +24,7 @@ public class PlayerAttack : MonoBehaviour
         {
             other.gameObject.GetComponent<Enemy>().SetDeathAnimation();
             GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jumpForceAfterAttack);
+            audioManager.PlayHitSFX();
         } 
     }
 }

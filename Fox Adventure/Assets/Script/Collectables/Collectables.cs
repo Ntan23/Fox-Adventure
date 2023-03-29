@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class Collectables : MonoBehaviour
 {
-    GameManager gm;
+    private GameManager gm;
+    private AudioManager audioManager;
 
     void Start()
     {
         gm = GameManager.Instance;
+        audioManager = AudioManager.Instance;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -17,6 +19,7 @@ public class Collectables : MonoBehaviour
         {
             gm.IncreaseCollectedItemCount();
             gameObject.SetActive(false);
+            audioManager.PlayCollectCollectablesSFX();
         }
     }
 }

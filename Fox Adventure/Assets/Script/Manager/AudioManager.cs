@@ -25,12 +25,60 @@ public class AudioManager : MonoBehaviour
     #endregion
     [SerializeField] private Sound[] soundEffects;
 
-    public void Play(string name)
+    private void Play(string name)
     {
         Sound s = System.Array.Find(soundEffects,sound=>sound.name==name);
 
         if(s == null) return;
 
         s.source.PlayOneShot(s.clip);
+    }
+
+    public void PlayFootstepSFX()
+    {
+        int randomIndex = Random.Range(0,2);
+
+        if(randomIndex == 0) Play("Footstep1");
+        else Play("Footstep2");
+    }
+
+    public void PlayHitSFX()
+    {
+        Play("Hit");
+    }
+
+    public void PlayJumpSFX()
+    {
+        Play("Jump");
+    }
+
+    public void PlayFallSFX()
+    {
+        Play("Fall");
+    }
+
+    public void PlayCollectCollectablesSFX()
+    {
+        Play("CollectCollectables");
+    }
+
+    public void PlayHurtSFX()
+    {
+        Play("Hurt");
+    }
+
+    public void PlayFallToPitSFX()
+    {
+        Play("FallToPit");
+    }
+
+    public void PlayUIPopUpSFX()
+    {
+        Play("UIPopUp");
+    }
+
+    public void PlayVictorySFX()
+    {
+        Play("Victory");
     }
 }

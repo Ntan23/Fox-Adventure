@@ -4,15 +4,34 @@ using UnityEngine;
 
 public class PlayerFootstepSFX : MonoBehaviour
 {
-    [SerializeField] private AudioSource[] audioSource;
+    #region FloatVariables
+    private float footstepTimer;
+    private float maxFootstepTimer = 0.3f;
+    #endregion
 
-    void PlayFootstepSFX1()
+    #region OtherVariables
+    private AudioManager audioManager;
+    private PlayerController playerController;
+    private GameManager gm;
+    #endregion
+
+    void Start()
     {
-        audioSource[0].Play();
+        audioManager = AudioManager.Instance;
+        gm = GameManager.Instance;
+
+        playerController = GetComponent<PlayerController>();
     }
 
-    void PlayFootstepSFX2()
+    void Update()
     {
-        audioSource[1].Play();
+        footstepTimer += Time.deltaTime;
+
+        if(footstepTimer > maxFootstepTimer)
+        {
+            footstepTimer = 0;
+
+            if(playerController.IsRunning() && gm.IsPlaying()) audioManager.PlayFootstepSFX();
+        }
     }
 }

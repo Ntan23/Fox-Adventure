@@ -17,10 +17,11 @@ public class Enemy : MonoBehaviour
     {
         animator.SetTrigger("Death");
         rb.velocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Kinematic;
     }
 
     public void Death()
     {
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
     }
 }
