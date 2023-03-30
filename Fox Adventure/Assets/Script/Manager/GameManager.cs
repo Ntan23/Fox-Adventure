@@ -29,9 +29,17 @@ public class GameManager : MonoBehaviour
     private Vector3 playerRespawnPosition;
     private int playerLivesCount;
     [SerializeField] private GameObject[] playerHealth;
+    [SerializeField] private SpriteRenderer playerSpriteRenderer;
+
+    [Header("Hurt IFrames")]
+    [SerializeField] private float iFramesDuration;
+    [SerializeField] private float numberOfFlashes;
+    public bool IsInvunerable = false;
 
     [Header("Collectables")]
     [SerializeField] private GameObject[] cherries;
+    [SerializeField] private PowerUp[] powerUps;
+
     private int collectedItemCount;
     private int maxCollectedItemCount;
     [SerializeField] private CollectablesCountUI collectablesCountUI;
@@ -42,10 +50,12 @@ public class GameManager : MonoBehaviour
     [Header("Others")]
     [SerializeField] private MustCollectUI mustCollectUI;
     [SerializeField] private VictoryUI victoryUI;
+    [SerializeField] private LoseUI loseUI;
+    private int maxLevelCount = 3;
+    [SerializeField] private int currentLevel;
     private AudioManager audioManager;
     #endregion
 
-    // Start is called before the first frame update
     void Start()
     {
         playerRespawnPosition = player.transform.position;
@@ -53,12 +63,6 @@ public class GameManager : MonoBehaviour
 
         playerLivesCount = 3;
         gameState = State.Playing;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void IncreaseCollectedItemCount()
@@ -80,8 +84,9 @@ public class GameManager : MonoBehaviour
     public void Respawn()
     {
         player.transform.position = playerRespawnPosition;
-        LoseLive();
-        ResetEaglesInScene();
+        if(!IsInvunerable) LoseLive();
+        if(eagles != null) RespawnEagles();
+        if(powerUps != null) RespawnPowerUps();
     }
 
     public void CheckSituation()
@@ -90,7 +95,6 @@ public class GameManager : MonoBehaviour
         {
             mustCollectUI.ShowMustCollectUI();
             audioManager.PlayUIPopUpSFX();
-            ResetEaglesInScene();
         }
         else if(collectedItemCount == maxCollectedItemCount) 
         {
@@ -100,11 +104,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ResetEaglesInScene()
+    public void RespawnEagles()
     {
         foreach(Eagle eagle in eagles)
         {
             if(!eagle.gameObject.activeInHierarchy) eagle.gameObject.SetActive(true);
+        }
+    }
+
+    public void RespawnPowerUps()
+    {
+        foreach(PowerUp powerUp in powerUps)
+        {
+            if(!powerUp.gameObject.activeInHierarchy) powerUp.gameObject.SetActive(true);
         }
     }
 
@@ -113,16 +125,48 @@ public class GameManager : MonoBehaviour
         playerLivesCount--;
         playerHealth[playerLivesCount].SetActive(false);
 
+        StartCoroutine(Invunerability());
+
         if(playerLivesCount == 0) 
         {
             gameState = State.GameOver;
-            Time.timeScale = 0f;
-            Debug.Log("You Lose");
+            loseUI.ShowLoseUI();
+            audioManager.PlayLoseSFX();
         }
     }
 
     public bool IsPlaying()
     {
         return gameState == State.Playing;
+    }
+
+    public bool EagleIsNull()
+    {
+        return eagles == null;
+    }
+
+    public bool PowerUpIsNull()
+    {
+        return powerUps == null;
+    }
+
+    public bool MaxLevel()
+    {
+        return currentLevel == maxLevelCount;
+    }
+
+    IEnumerator Invunerability()
+    {
+        IsInvunerable = true;
+        Physics2D.IgnoreLayerCollision(7, 0,true);
+        for (int i = 0; i < numberOfFlashes; i++)
+        {
+            playerSpriteRenderer.color = new Color(1,0,0,0.8f);
+            yield return new WaitForSeconds(iFramesDuration/(numberOfFlashes*2));
+            playerSpriteRenderer.color = Color.white;
+            yield return new WaitForSeconds(iFramesDuration/(numberOfFlashes*2));
+        }
+        Physics2D.IgnoreLayerCollision(7, 0,false);
+        IsInvunerable=false;
     }
 }

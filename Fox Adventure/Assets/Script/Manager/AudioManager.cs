@@ -81,4 +81,9 @@ public class AudioManager : MonoBehaviour
     {
         Play("Victory");
     }
+
+    public void PlayLoseSFX()
+    {
+        Play("Lose");
+    }
 }

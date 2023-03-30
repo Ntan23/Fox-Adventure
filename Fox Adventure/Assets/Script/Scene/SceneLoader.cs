@@ -6,13 +6,12 @@ using UnityEngine.SceneManagement;
 public static class SceneLoader
 {
     public enum Scene {
-        MainMenu, LoadingScene, DifficultySelector, Level1
+        MainMenu, LoadingScene, LevelSelector, Level1, Level2,  Level3
     }
     private static Scene targetScene;
 
     public static void Load(Scene targetScene)
     {
-        Time.timeScale = 1;
         SceneLoader.targetScene = targetScene;
 
         SceneManager.LoadSceneAsync(Scene.LoadingScene.ToString());
@@ -25,7 +24,6 @@ public static class SceneLoader
 
     public static void ReloadScene()
     {   
-        Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FrogAI : MonoBehaviour
+public class FrogAI : Enemy
 {
     #region FloatVariables
-    [SerializeField] private float xLeftCap;
-    [SerializeField] private float xRightCap;
     [SerializeField] private float jumpLength;
     [SerializeField] private float jumpHeight;
+    #endregion
+
+    #region TransformVariables
+    [SerializeField] private Transform leftPosition;
+    [SerializeField] private Transform rightPosition;
     #endregion
 
     #region BoolVariables
@@ -18,48 +21,56 @@ public class FrogAI : MonoBehaviour
     #region OtherVariables
     [SerializeField] private LayerMask groundLayer;
     private Collider2D frogCollider;
-    private Rigidbody2D rb;
     private FrogAnimationControl frogAnimationControl;
+    private GameManager gm;
     #endregion
     
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         frogCollider = GetComponent<Collider2D>();
-        rb = GetComponent<Rigidbody2D>();
         frogAnimationControl =GetComponent<FrogAnimationControl>();
+    }
+
+    void Start()
+    {
+        gm = GameManager.Instance;
     }
 
     void MoveAI()
     {
-        if(facingLeft)
+        if(gm.IsPlaying())
         {
-            if(transform.position.x > xLeftCap)
+            if(facingLeft)
             {
-                if(transform.localScale.x != 1) transform.localScale = new Vector3(1, 1, 1);
-
-                if(frogCollider.IsTouchingLayers(groundLayer)) 
+                if(transform.position.x > leftPosition.position.x)
                 {
-                    rb.velocity = new Vector2(-jumpLength, jumpHeight);
+                    if(transform.localScale.x != 1) transform.localScale = new Vector3(1, 1, 1);
 
-                    frogAnimationControl.SetJumpAnimation();
+                    if(frogCollider.IsTouchingLayers(groundLayer)) 
+                    {
+                        rb.velocity = new Vector2(-jumpLength, jumpHeight);
+
+                        frogAnimationControl.SetJumpAnimation();
+                    }
                 }
+                else facingLeft = false;
             }
-            else facingLeft = false;
-        }
-        else if(!facingLeft)
-        {
-            if(transform.position.x < xRightCap)
+            else if(!facingLeft)
             {
-                if(transform.localScale.x != -1) transform.localScale = new Vector3(-1, 1, 1);
-
-                if(frogCollider.IsTouchingLayers(groundLayer)) 
+                if(transform.position.x < rightPosition.position.x)
                 {
-                    rb.velocity = new Vector2(jumpLength, jumpHeight);
+                    if(transform.localScale.x != -1) transform.localScale = new Vector3(-1, 1, 1);
 
-                    frogAnimationControl.SetJumpAnimation();
+                    if(frogCollider.IsTouchingLayers(groundLayer)) 
+                    {
+                        rb.velocity = new Vector2(jumpLength, jumpHeight);
+
+                        frogAnimationControl.SetJumpAnimation();
+                    }
                 }
+                else facingLeft = true;
             }
-            else facingLeft = true;
         }
     }
 }

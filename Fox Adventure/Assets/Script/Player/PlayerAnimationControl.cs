@@ -17,4 +17,9 @@ public class PlayerAnimationControl : MonoBehaviour
     {
         animator.SetInteger("State",state);
     }
+
+    public void SetAnimationSpeed(float speed)
+    {
+        animator.speed = speed;
+    }
 }

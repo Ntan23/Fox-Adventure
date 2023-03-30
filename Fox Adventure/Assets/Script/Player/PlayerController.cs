@@ -1,13 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    #region EnumVariables
+    private enum State {
+        Idle, Running, Jumping, Falling, Hurt, Climb
+    }
+
+    private State state;
+    #endregion
+
     #region FloatVariables
     [SerializeField] private float speed;
+    [SerializeField] private float climbSpeed;
     public float jumpForce;
     private float horizontalValue;
+    private float intialGravityScale;
     #endregion
 
     #region IntegerVariables
@@ -15,12 +26,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int maxJumpCount;
     #endregion
 
-    #region EnumVariables
-    private enum State {
-        Idle, Running , Jumping , Falling , Hurt
-    }
-
-    private State state;
+    #region BoolVariables
+    private bool canClimb = false;
+    private bool atTopLadder = false;
+    private bool atBottomLadder = false;
     #endregion
 
     #region OtherVariables
@@ -30,6 +39,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     private AudioManager audioManager;
     private GameManager gm;
+    private Ladder ladder;
     #endregion
 
     void Awake()
@@ -43,35 +53,90 @@ public class PlayerController : MonoBehaviour
 
         state = State.Idle;
         jumpCount = 0;
+        intialGravityScale = rb.gravityScale;
     }   
 
     void Update()
     {   
-        if(state != State.Hurt && gm.IsPlaying())
+        if(gm.IsPlaying())
         {
-            MoveLeftAndRight();
-            Jump(); 
+            if(state == State.Climb) Climb();
+            else if(state != State.Hurt)
+            {
+                Move();
+                Jump(); 
+            }   
         }
 
         CheckState();
         playerAnimationControl.SetAnimation((int) state);
     }
 
-    void MoveLeftAndRight()
+    void Move()
     {
         horizontalValue = Input.GetAxisRaw("Horizontal");
 
+        //Climb
+        if(canClimb && Mathf.Abs(Input.GetAxisRaw("Vertical")) > 0.1f) 
+        {
+            state = State.Climb;
+            rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+            transform.position = new Vector3(ladder.transform.position.x, rb.position.y);
+            rb.gravityScale = 0;
+        }
+
+        //Move Left
         if(horizontalValue < 0) 
         {
             rb.velocity = new Vector2(-speed, rb.velocity.y);
             transform.localScale = new Vector2(-1, 1);
         }   
 
+        //MoveRight
         if(horizontalValue > 0)
         {
             rb.velocity = new Vector2(speed, rb.velocity.y);
             transform.localScale = new Vector2(1, 1);
         } 
+    }
+
+    private void Climb()
+    {
+        float verticalValue = Input.GetAxisRaw("Vertical");
+
+        //Check If Jump 
+        if(Input.GetButtonDown("Jump"))
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            canClimb = false;
+            rb.gravityScale = intialGravityScale;
+
+            playerAnimationControl.SetAnimationSpeed(1.0f);
+
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            state = State.Jumping;
+            audioManager.PlayJumpSFX();
+
+            return;
+        }
+
+        if(verticalValue > 0.1f && !atTopLadder)
+        {
+            //Climbing Up
+            rb.velocity = new Vector2(0, verticalValue * climbSpeed);
+            playerAnimationControl.SetAnimationSpeed(1.0f);
+        }
+        else if(verticalValue < -0.1f && !atBottomLadder)
+        {
+            //Climbing Down
+            rb.velocity = new Vector2(0, verticalValue * climbSpeed);
+            playerAnimationControl.SetAnimationSpeed(1.0f);
+        }
+        else 
+        {
+            playerAnimationControl.SetAnimationSpeed(0.0f);
+            rb.velocity = Vector2.zero;
+        }
     }
 
     void Jump()
@@ -93,7 +158,11 @@ public class PlayerController : MonoBehaviour
 
     void CheckState()
     {
-        if(state == State.Jumping) 
+        if(state == State.Climb)
+        {
+
+        }
+        else if(state == State.Jumping) 
         {
             if(rb.velocity.y < 0.1f) 
             {
@@ -142,5 +211,25 @@ public class PlayerController : MonoBehaviour
     public float GetJumpForce()
     {
         return jumpForce;
+    }
+
+    public void ChangeCanClimb(bool value)
+    {
+        canClimb = value;
+    }
+
+    public void ChangeTopLadder(bool value)
+    {
+        atTopLadder = value;
+    }
+
+    public void ChangeBottomLadder(bool value)
+    {
+        atBottomLadder = value;
+    }
+
+    public void SetLadder(Ladder ladderScript)
+    {
+        ladder = ladderScript;
     }
 }

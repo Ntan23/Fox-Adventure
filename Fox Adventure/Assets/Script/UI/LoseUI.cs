@@ -3,35 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class VictoryUI : MonoBehaviour
+public class LoseUI : MonoBehaviour
 {
     [SerializeField] private Button retryButton;
-    [SerializeField] private Button nextLevelButton;
     [SerializeField] private Button mainMenuButton;
-    [SerializeField] private SceneLoader.Scene nextScene;
-    private GameManager gm;
 
     void Start()
     {
-        gm = GameManager.Instance;
-
         retryButton.onClick.AddListener(() => {
             SceneLoader.ReloadScene();
-        });
-
-        nextLevelButton.onClick.AddListener(() => {
-            SceneLoader.Load(nextScene);
         });
 
         gameObject.SetActive(false);
     }
 
-    public void ShowVictoryUI()
+    public void ShowLoseUI()
     {
         gameObject.SetActive(true);
-
-        if(gm.MaxLevel()) nextLevelButton.gameObject.SetActive(false);
-
+        
         void UpdateAlpha(float alpha)
         {
             GetComponent<CanvasGroup>().alpha = alpha;
@@ -39,11 +28,6 @@ public class VictoryUI : MonoBehaviour
             if(GetComponent<CanvasGroup>().alpha == 1)
             {
                 retryButton.interactable = true;
-
-                nextLevelButton.interactable = true;
-                
-                nextLevelButton.interactable = true;
-                
                 mainMenuButton.interactable = true;
             }
         }

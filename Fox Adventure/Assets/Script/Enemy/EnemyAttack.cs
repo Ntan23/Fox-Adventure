@@ -16,7 +16,7 @@ public class EnemyAttack : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if(other.gameObject.CompareTag("Player") && !other.gameObject.GetComponent<PlayerController>().IsFalling())
+        if(other.gameObject.CompareTag("Player") && !other.gameObject.GetComponent<PlayerController>().IsFalling() && !gm.IsInvunerable)
         {
             Rigidbody2D rb = other.gameObject.GetComponent<Rigidbody2D>();
             
