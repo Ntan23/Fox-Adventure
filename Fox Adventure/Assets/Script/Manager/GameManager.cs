@@ -47,6 +47,11 @@ public class GameManager : MonoBehaviour
     [Header("Enemy")]
     [SerializeField] private Eagle[] eagles;
 
+    [Header("Camera Shake Effect")]
+    [SerializeField] private CameraShake cameraShake;
+    [SerializeField] private float intensity;
+    [SerializeField] private float shakeDuration;
+
     [Header("Others")]
     [SerializeField] private MustCollectUI mustCollectUI;
     [SerializeField] private VictoryUI victoryUI;
@@ -63,6 +68,8 @@ public class GameManager : MonoBehaviour
 
         playerLivesCount = 3;
         gameState = State.Playing;
+
+        Physics2D.IgnoreLayerCollision(7, 0,false);
     }
 
     public void IncreaseCollectedItemCount()
@@ -100,6 +107,8 @@ public class GameManager : MonoBehaviour
         {
             victoryUI.ShowVictoryUI();
             audioManager.PlayVictorySFX();
+
+            if(PlayerPrefs.GetInt("LevelUnlocked") < currentLevel + 1) PlayerPrefs.SetInt("LevelUnlocked",currentLevel + 1);
             gameState = State.GameOver;
         }
     }
@@ -108,7 +117,11 @@ public class GameManager : MonoBehaviour
     {
         foreach(Eagle eagle in eagles)
         {
-            if(!eagle.gameObject.activeInHierarchy) eagle.gameObject.SetActive(true);
+            if(!eagle.gameObject.activeInHierarchy) 
+            {
+                eagle.gameObject.SetActive(true);
+                eagle.gameObject.GetComponent<Collider2D>().enabled = true;
+            }
         }
     }
 
@@ -123,6 +136,8 @@ public class GameManager : MonoBehaviour
     public void LoseLive()
     {
         playerLivesCount--;
+
+        cameraShake.ShakeCamera(intensity, shakeDuration);
         playerHealth[playerLivesCount].SetActive(false);
 
         StartCoroutine(Invunerability());

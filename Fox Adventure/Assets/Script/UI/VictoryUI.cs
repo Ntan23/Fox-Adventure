@@ -23,6 +23,10 @@ public class VictoryUI : MonoBehaviour
             SceneLoader.Load(nextScene);
         });
 
+        mainMenuButton.onClick.AddListener(() => {
+            SceneLoader.Load(SceneLoader.Scene.MainMenu);
+        });
+
         gameObject.SetActive(false);
     }
 

@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class FrogAnimationControl : Enemy
 {
-    private Collider2D frogCollider;
     [SerializeField] private LayerMask groundLayer;
 
     protected override void Awake()
     {
         base.Awake();
-        frogCollider = GetComponent<Collider2D>();
     }
 
     void Update()
@@ -24,7 +22,7 @@ public class FrogAnimationControl : Enemy
             }
         }
 
-        if(frogCollider.IsTouchingLayers(groundLayer) && animator.GetBool("Falling"))
+        if(enemyCollider.IsTouchingLayers(groundLayer) && animator.GetBool("Falling"))
         {
             animator.SetBool("Jumping",false);
             animator.SetBool("Falling",false);

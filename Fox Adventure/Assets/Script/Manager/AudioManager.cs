@@ -86,4 +86,14 @@ public class AudioManager : MonoBehaviour
     {
         Play("Lose");
     }
+
+    public void PlayHoverSFX()
+    {
+        Play("Hover");
+    }
+
+    public void PlayClickSFX()
+    {
+        Play("Click");
+    }
 }

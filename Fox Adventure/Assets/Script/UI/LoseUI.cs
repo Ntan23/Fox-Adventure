@@ -14,6 +14,10 @@ public class LoseUI : MonoBehaviour
             SceneLoader.ReloadScene();
         });
 
+        mainMenuButton.onClick.AddListener(() => {
+            SceneLoader.Load(SceneLoader.Scene.MainMenu);
+        });
+
         gameObject.SetActive(false);
     }
 

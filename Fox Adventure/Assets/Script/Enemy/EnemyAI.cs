@@ -5,60 +5,96 @@ using UnityEngine;
 /*ISP*/
 public interface IFrogAI
 {
-    void AI(Transform transform, Transform leftPosition, Transform rightPosition, float jumpLength, float jumpHeight, Rigidbody2D rigidbody2D, Collider2D collider, LayerMask layerMask, FrogAnimationControl frogAnimationControl);
+    void AI(bool canMove, Transform transform, Transform leftPosition, Transform rightPosition, float jumpLength, float jumpHeight, float idleDuration, Rigidbody2D rigidbody2D, Collider2D collider, LayerMask layerMask, FrogAnimationControl frogAnimationControl);
 }
 
 public interface IOpposumAI
 {
-    void AI(Transform transform, Transform leftPosition, Transform rightPosition, float speed);
+    void AI(bool canMove, bool withIdle, Transform transform, Transform leftPosition, Transform rightPosition, float speed, float idleDuration);
 }
 
 public class Frog : IFrogAI 
 {
+    private float idleTimer;
+    private float maxIdleDuration;
     private bool facingLeft = true;
+    private bool firstTimeCheck = true;
 
-    public void AI(Transform transform, Transform leftPosition, Transform rightPosition, float jumpLength, float jumpHeight, Rigidbody2D rb,Collider2D frogCollider, LayerMask groundLayer, FrogAnimationControl frogAnimationControl)
+    public void AI(bool canMove, Transform transform, Transform leftPosition, Transform rightPosition, float jumpLength, float jumpHeight, float idleDuration, Rigidbody2D rb,Collider2D frogCollider, LayerMask groundLayer, FrogAnimationControl frogAnimationControl)
     {
-        if(facingLeft)
+        if(firstTimeCheck)
         {
-            if(transform.position.x > leftPosition.position.x)
+            idleTimer = idleDuration;
+            firstTimeCheck = false;
+        }
+
+        if(facingLeft && canMove)
+        {
+            idleTimer += Time.deltaTime;
+
+            if(idleTimer > idleDuration)
             {
-                if(transform.localScale.x != 1) transform.localScale = new Vector3(1, 1, 1);
+                idleTimer = 0;
 
-                if(frogCollider.IsTouchingLayers(groundLayer)) 
+                if(transform.position.x > leftPosition.position.x)
                 {
-                    rb.velocity = new Vector2(-jumpLength, jumpHeight);
+                    if(transform.localScale.x != 1) transform.localScale = new Vector3(1, 1, 1);
 
-                    frogAnimationControl.SetJumpAnimation();
+                    if(frogCollider.IsTouchingLayers(groundLayer)) 
+                    {
+                        rb.velocity = new Vector2(-jumpLength, jumpHeight);
+
+                        frogAnimationControl.SetJumpAnimation();
+                    }
+                }
+                else 
+                {
+                    idleTimer = idleDuration;
+                    facingLeft = false;
                 }
             }
-            else facingLeft = false;
         }
         else if(!facingLeft)
         {
-            if(transform.position.x < rightPosition.position.x)
+            idleTimer += Time.deltaTime;
+
+            if(idleTimer > idleDuration)
             {
-                if(transform.localScale.x != -1) transform.localScale = new Vector3(-1, 1, 1);
+                idleTimer = 0;
 
-                if(frogCollider.IsTouchingLayers(groundLayer)) 
+                if(transform.position.x < rightPosition.position.x)
                 {
-                    rb.velocity = new Vector2(jumpLength, jumpHeight);
+                    if(transform.localScale.x != -1) transform.localScale = new Vector3(-1, 1, 1);
 
-                    frogAnimationControl.SetJumpAnimation();
+                    if(frogCollider.IsTouchingLayers(groundLayer)) 
+                    {
+                        rb.velocity = new Vector2(jumpLength, jumpHeight);
+
+                        frogAnimationControl.SetJumpAnimation();
+                    }
+                }
+                else 
+                {
+                    idleTimer = idleDuration;
+                    facingLeft = true;
                 }
             }
-            else facingLeft = true;
         }
     }
 }
 
 public class Opposum : IOpposumAI
 {
+    private float idleTimer = 0;
+    private float maxIdleDuration;
     private bool facingLeft = true;
 
-    public void AI(Transform transform, Transform leftPosition, Transform rightPosition, float speed)
+    public void AI(bool canMove, bool withIdle, Transform transform, Transform leftPosition, Transform rightPosition, float speed, float idleDuration)
     {
-        if(facingLeft)
+        if(withIdle) maxIdleDuration = idleDuration;
+        if(!withIdle) maxIdleDuration = 0;
+
+        if(facingLeft && canMove)
         {
             if(Vector2.Distance(transform.position, leftPosition.position) > 0)
             {
@@ -66,9 +102,18 @@ public class Opposum : IOpposumAI
 
                 transform.position = Vector3.MoveTowards(transform.position, leftPosition.position, speed * Time.deltaTime);
             }
-            else facingLeft = false;
+            else
+            {
+                idleTimer += Time.deltaTime;
+
+                if(idleTimer > maxIdleDuration)
+                {
+                    idleTimer = 0;
+                    facingLeft = false;
+                }
+            }
         }
-        else if(!facingLeft)
+        else if(!facingLeft && canMove)
         {
             if(Vector2.Distance(transform.position, rightPosition.position) > 0)
             {
@@ -76,7 +121,16 @@ public class Opposum : IOpposumAI
 
                 transform.position = Vector3.MoveTowards(transform.position, rightPosition.position, speed * Time.deltaTime);
             }
-            else facingLeft = true;
+            else
+            {
+                idleTimer += Time.deltaTime;
+
+                if(idleTimer > maxIdleDuration)
+                {
+                    idleTimer = 0;
+                    facingLeft = true;
+                }
+            }
         }
     }
 }
@@ -99,15 +153,16 @@ public class EnemyAI : Enemy
     #region OtherVariables
     [SerializeField] private Transform leftPosition;
     [SerializeField] private Transform rightPosition;
+    [SerializeField] private float idleDuration;
     [Header("For Frog")]
     [SerializeField] private float jumpLength;
     [SerializeField] private float jumpHeight;
-    [SerializeField] private Collider2D frogCollider;
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private FrogAnimationControl frogAnimationControl;
 
     [Header("For Opposum")]
     [SerializeField] private float speed;
+    [SerializeField] private bool withIdle;
     #endregion
 
     protected override void Awake()
@@ -125,13 +180,8 @@ public class EnemyAI : Enemy
     {
         if(GameManager.Instance.IsPlaying())
         {
-            if(enemyType == Type.Opposum) opposum.AI(transform, leftPosition, rightPosition, speed);
+            if(enemyType == Type.Frog) frog.AI(canMove, transform, leftPosition, rightPosition, jumpLength, jumpHeight, idleDuration, rb, enemyCollider, layerMask, frogAnimationControl);
+            if(enemyType == Type.Opposum) opposum.AI(canMove, withIdle, transform, leftPosition, rightPosition, speed, idleDuration);
         }
-    }
-
-    //For Animation Event
-    void FrogAI()
-    {
-        if(enemyType == Type.Frog) frog.AI(transform, leftPosition, rightPosition, jumpLength, jumpHeight, rb, frogCollider, layerMask, frogAnimationControl);
     }
 }
