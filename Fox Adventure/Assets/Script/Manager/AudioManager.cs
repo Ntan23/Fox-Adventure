@@ -96,4 +96,9 @@ public class AudioManager : MonoBehaviour
     {
         Play("Click");
     }
+
+    public void PlayPowerUpSFX()
+    {
+        Play("PowerUp");
+    }
 }

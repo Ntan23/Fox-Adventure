@@ -15,6 +15,7 @@ public class PowerUp : MonoBehaviour
     #region OtherVariables
     [SerializeField] private PlayerController playerController;
     private Animator animator;
+    private AudioManager audioManager;
     #endregion
 
     void Start()
@@ -23,6 +24,7 @@ public class PowerUp : MonoBehaviour
         intialJumpForce = playerController.GetJumpForce();
 
         animator = GetComponent<Animator>();
+        audioManager = AudioManager.Instance;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -30,7 +32,7 @@ public class PowerUp : MonoBehaviour
         if(other.CompareTag("Player"))
         {
             animator.SetTrigger("Feedback");
-
+            audioManager.PlayPowerUpSFX();
             StartCoroutine(PowerUpEffect(other.gameObject));
         }
     }

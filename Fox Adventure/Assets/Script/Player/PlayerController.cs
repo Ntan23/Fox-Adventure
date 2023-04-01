@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float climbSpeed;
     public float jumpForce;
     private float horizontalValue;
+    private float verticalValue;
     private float intialGravityScale;
     #endregion
 
@@ -75,9 +76,10 @@ public class PlayerController : MonoBehaviour
     void Move()
     {
         horizontalValue = Input.GetAxisRaw("Horizontal");
+        verticalValue = Input.GetAxisRaw("Vertical");
 
         //Climb
-        if(canClimb && Mathf.Abs(Input.GetAxisRaw("Vertical")) > 0.1f) 
+        if(canClimb && Mathf.Abs(verticalValue) > 0.1f) 
         {
             state = State.Climb;
             rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;

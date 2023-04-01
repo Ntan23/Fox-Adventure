@@ -18,6 +18,7 @@ public class Frog : IFrogAI
     private float idleTimer;
     private float maxIdleDuration;
     private bool facingLeft = true;
+    private Vector3 transformAfterJump;
     private bool firstTimeCheck = true;
 
     public void AI(bool canMove, Transform transform, Transform leftPosition, Transform rightPosition, float jumpLength, float jumpHeight, float idleDuration, Rigidbody2D rb,Collider2D frogCollider, LayerMask groundLayer, FrogAnimationControl frogAnimationControl)
@@ -35,8 +36,9 @@ public class Frog : IFrogAI
             if(idleTimer > idleDuration)
             {
                 idleTimer = 0;
+                transformAfterJump = transform.position + new Vector3(-jumpLength, 0f ,0f);
 
-                if(transform.position.x > leftPosition.position.x)
+                if(transformAfterJump.x >= leftPosition.position.x)
                 {
                     if(transform.localScale.x != 1) transform.localScale = new Vector3(1, 1, 1);
 
@@ -61,8 +63,9 @@ public class Frog : IFrogAI
             if(idleTimer > idleDuration)
             {
                 idleTimer = 0;
+                transformAfterJump = transform.position + new Vector3(jumpLength, 0f ,0f);
 
-                if(transform.position.x < rightPosition.position.x)
+                if(transformAfterJump.x <= rightPosition.position.x)
                 {
                     if(transform.localScale.x != -1) transform.localScale = new Vector3(-1, 1, 1);
 

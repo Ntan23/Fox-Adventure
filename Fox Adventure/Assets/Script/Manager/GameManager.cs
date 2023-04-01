@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     #region EnumVariables
     private enum State {
-        Playing , GameOver
+        Playing, GameOver, GamePaused
     }
 
     private State gameState;
@@ -52,12 +52,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float intensity;
     [SerializeField] private float shakeDuration;
 
+    [Header("Level")]
+    [SerializeField] private int currentLevel;
+    private int maxLevelCount = 3;
+
     [Header("Others")]
     [SerializeField] private MustCollectUI mustCollectUI;
     [SerializeField] private VictoryUI victoryUI;
     [SerializeField] private LoseUI loseUI;
-    private int maxLevelCount = 3;
-    [SerializeField] private int currentLevel;
+    [SerializeField] private PauseMenuUI pauseMenuUI;
     private AudioManager audioManager;
     #endregion
 
@@ -70,6 +73,11 @@ public class GameManager : MonoBehaviour
         gameState = State.Playing;
 
         Physics2D.IgnoreLayerCollision(7, 0,false);
+    }
+
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape) && gameState == State.Playing) pauseMenuUI.ShowPauseMenu();
     }
 
     public void IncreaseCollectedItemCount()
@@ -183,5 +191,15 @@ public class GameManager : MonoBehaviour
         }
         Physics2D.IgnoreLayerCollision(7, 0,false);
         IsInvunerable=false;
+    }
+
+    public void PauseGame()
+    {
+        gameState = State.GamePaused;
+    }
+
+    public void UnpauseGame()
+    {
+        gameState = State.Playing;
     }
 }

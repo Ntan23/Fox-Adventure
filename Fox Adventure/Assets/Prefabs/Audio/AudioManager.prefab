@@ -45,7 +45,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 736726968512507766, guid: 12c601e017eeb2740994525ef1c9c97b, type: 2}
   m_audioClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.2
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -172,21 +172,21 @@ MonoBehaviour:
     audioMixer: {fileID: -7002426310851416546, guid: 12c601e017eeb2740994525ef1c9c97b, type: 2}
   - name: CollectCollectables
     clip: {fileID: 8300000, guid: 0c008ee3ee72a4362a35be25fa5de043, type: 3}
-    volume: 1
+    volume: 0.8
     pitch: 1
     loop: 0
     source: {fileID: 0}
     audioMixer: {fileID: -7002426310851416546, guid: 12c601e017eeb2740994525ef1c9c97b, type: 2}
   - name: Jump
     clip: {fileID: 8300000, guid: fe0b1f9aeb45b41b089175aeeabd5d95, type: 3}
-    volume: 1
+    volume: 0.8
     pitch: 1
     loop: 0
     source: {fileID: 0}
     audioMixer: {fileID: -7002426310851416546, guid: 12c601e017eeb2740994525ef1c9c97b, type: 2}
   - name: Fall
     clip: {fileID: 8300000, guid: d46323e22e74e46baa241cbf48c85671, type: 3}
-    volume: 1
+    volume: 0.8
     pitch: 1
     loop: 0
     source: {fileID: 0}
@@ -229,6 +229,13 @@ MonoBehaviour:
   - name: Click
     clip: {fileID: 8300000, guid: 81652031b64c342cc8dbc59c138d77c5, type: 3}
     volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+    audioMixer: {fileID: -7002426310851416546, guid: 12c601e017eeb2740994525ef1c9c97b, type: 2}
+  - name: PowerUp
+    clip: {fileID: 8300000, guid: 7bd6b897eb5ca4b7d88a205c4a51640c, type: 3}
+    volume: 0.8
     pitch: 1
     loop: 0
     source: {fileID: 0}
